@@ -50,7 +50,7 @@ public class GameThread extends Thread{
 //		加载主角
 		GameLoad.loadPlay();//也可以带参数，单机还是2人
 //		加载敌人NPC等
-		
+		 GameLoad.loadEnemies(); // 加载敌人
 //		全部加载完成，游戏启动
 	}
 	/**
@@ -62,33 +62,45 @@ public class GameThread extends Thread{
 	 * */
 	
 	private void gameRun() {
-		long gameTime=0L;//给int类型就可以啦
-		while(true) {// 预留扩展   true可以变为变量，用于控制管关卡结束等
-			Map<GameElement, List<ElementObj>> all = em.getGameElements();
-			List<ElementObj> enemys = em.getElementsByKey(GameElement.ENEMY);
-			List<ElementObj> files = em.getElementsByKey(GameElement.PLAYFILE);
-			List<ElementObj> maps = em.getElementsByKey(GameElement.MAPS);
-			  List<ElementObj> plays = em.getElementsByKey(GameElement.PLAY);
-			moveAndUpdate(all,gameTime);//	游戏元素自动化方法
-			
-			ElementPK(enemys,files);
-			ElementPK(files,maps);
-			
-			 // 检测小车和墙之间的碰撞
+	    long gameTime = 0L; // 唯一的时间控制
+	    while (true) { // 预留扩展，true可以变为变量，用于控制关卡结束等
+	        Map<GameElement, List<ElementObj>> all = em.getGameElements();
+	        List<ElementObj> enemys = em.getElementsByKey(GameElement.ENEMY);
+	        List<ElementObj> files = em.getElementsByKey(GameElement.PLAYFILE);
+	        List<ElementObj> maps = em.getElementsByKey(GameElement.MAPS);
+	        List<ElementObj> plays = em.getElementsByKey(GameElement.PLAY);
+
+	        moveAndUpdate(all, gameTime); // 游戏元素自动化方法
+
+	        ElementPK(enemys, files);
+	        ElementPK(files, maps);
+
+	        // 检测敌人和墙之间的碰撞
+	        for (ElementObj enemy : enemys) {
+	            for (ElementObj map : maps) {
+	                enemy.pk(map);
+	            }
+	        }
+
+	        // 检测小车和墙之间的碰撞
 	        for (ElementObj play : plays) {
 	            for (ElementObj map : maps) {
 	                play.pk(map); // 调用碰撞检测方法
 	            }
 	        }
-			
-			gameTime++;//唯一的时间控制
-			try {
-				sleep(10);//默认理解为 1秒刷新100次 
-			} catch (InterruptedException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
-		}
+
+	        // 更新敌人状态
+	        for (ElementObj enemy : enemys) {
+	            enemy.model(gameTime); // 调用敌人的移动逻辑
+	        }
+
+	        gameTime++; // 唯一的时间控制
+	        try {
+	            sleep(10); // 默认理解为 1秒刷新100次
+	        } catch (InterruptedException e) {
+	            e.printStackTrace();
+	        }
+	    }
 	}
 	public void ElementPK(List<ElementObj> listA,List<ElementObj>listB) {
 //		请大家在这里使用循环，做一对一判定，如果为真，就设置2个对象的死亡状态

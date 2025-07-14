@@ -14,6 +14,7 @@ import javax.swing.ImageIcon;
 
 import com.tedu.controller.GameThread;
 import com.tedu.element.ElementObj;
+import com.tedu.element.Enemy;
 import com.tedu.element.MapObj;
 import com.tedu.element.Play;
 
@@ -114,12 +115,17 @@ public class GameLoad {
 	}
 	public static void loadEnemies() {
 	    // 加载敌人对象
-	    String enemyStr = "100,100,bot_up"; // 示例敌人位置和类型
-	    ElementObj obj = getObj("enemy");
-	    ElementObj enemy = obj.createElement(enemyStr);
-	    em.addElement(enemy, GameElement.ENEMY);
+	    String[] enemyStrs = {
+	        "100,100,left",
+	        "200,200,up",
+	        "300,300,right",
+	        "400,400,down"
+	    };
+	    for (String enemyStr : enemyStrs) {
+	        ElementObj enemy = new Enemy().createElement(enemyStr);
+	        em.addElement(enemy, GameElement.ENEMY);
+	    }
 	}
-
 	public static ElementObj getObj(String str) {
 		try {
 			Class<?> class1 = objMap.get(str);
