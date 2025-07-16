@@ -9,7 +9,7 @@ public class GameStart {
     public static void main(String[] args) {
         GameJFrame gj = new GameJFrame();
         GameMainJPanel jp = new GameMainJPanel();
-        GameListener listener = new GameListener();
+        GameListener listener = new GameListener(gj);
         GameThread th = new GameThread(jp);
 
         gj.setjPanel(jp);

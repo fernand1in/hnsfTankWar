@@ -41,7 +41,7 @@ public class GameJFrame extends JFrame{
 	private GameThread thead=null;  //游戏主线程
 	private boolean PausedYes = false; // 游戏是否暂停
 	private JDialog pauseDialog; // 暂停对话框
-	
+
 	
 	public GameJFrame() {
 		init();
@@ -127,7 +127,7 @@ public class GameJFrame extends JFrame{
 	        System.out.println("重新绘画");
 
 	        // 启动游戏线程
-	        thead.startGame();
+            thead.startGame();
 
 	        // 启动新的游戏线程
 	        if (this.jPanel instanceof Runnable) {
@@ -150,6 +150,13 @@ public class GameJFrame extends JFrame{
         // 切换到关卡选择面板
         this.setContentPane(new LevelPanel(this));
         this.revalidate();
+    }
+    public void pauseGame() {
+        if (thead != null) {
+            PausedYes = true;
+            thead.setPaused(true); // 设置暂停标志
+        }
+        showPauseDialog();
     }
     public void resumeGame() {
         if (thead != null) {
@@ -256,9 +263,8 @@ public class GameJFrame extends JFrame{
         showStartPanel();
     }
 
-	
-	
-	
+
+
 }
 
 

@@ -68,6 +68,15 @@ public class GameThread extends Thread {
     private void gameRun() {
         long gameTime = 0L;
         while (true) {
+            if (paused) {
+                synchronized (this) {
+                    try {
+                        wait();
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
+                }
+            }
             Map<GameElement, List<ElementObj>> all = em.getGameElements();
             List<ElementObj> enemys = em.getElementsByKey(GameElement.ENEMY);
             List<ElementObj> files = em.getElementsByKey(GameElement.PLAYFILE);

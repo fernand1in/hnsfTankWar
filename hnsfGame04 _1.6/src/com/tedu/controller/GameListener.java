@@ -11,6 +11,8 @@ import com.tedu.manager.ElementManager;
 import com.tedu.manager.GameElement;
 import com.tedu.show.GameJFrame;
 
+import javax.swing.*;
+
 /**
  * @说明 监听类，用于监听用户的操作 KeyListener
  * @author renjj
@@ -25,7 +27,10 @@ public class GameListener implements KeyListener{
 	 * set集合
 	 * */
 	private Set<Integer> set=new HashSet<Integer>();
-	
+	private GameJFrame gameFrame;
+	public GameListener(GameJFrame gameFrame) {
+		this.gameFrame = gameFrame;
+	}
 	
 	@Override
 	public void keyTyped(KeyEvent e) {
@@ -44,6 +49,9 @@ public class GameListener implements KeyListener{
 			return;
 		}
 		set.add(key);
+		if (key == KeyEvent.VK_ESCAPE) {
+			gameFrame.pauseGame();
+		}
 		List<ElementObj> play = em.getElementsByKey(GameElement.PLAY);
 		for(ElementObj obj:play) {
 			obj.keyClick(true, e.getKeyCode());
