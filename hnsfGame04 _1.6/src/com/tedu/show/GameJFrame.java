@@ -41,8 +41,9 @@ public class GameJFrame extends JFrame{
 	private GameThread thead=null;  //游戏主线程
 	private boolean PausedYes = false; // 游戏是否暂停
 	private JDialog pauseDialog; // 暂停对话框
+    private static final int MIN_LEVEL = 1;
+    private static final int MAX_LEVEL = 10;
 
-	
 	public GameJFrame() {
 		init();
 	}
@@ -244,13 +245,22 @@ public class GameJFrame extends JFrame{
     }
     private void levelUp() {
         // 跳转到下一关
-        GameThread.setLevel(GameThread.getLevel() + 1);
-        startGame(GameThread.getLevel());
+        int currentLevel = GameThread.getLevel();
+        if (currentLevel < MAX_LEVEL) {
+            // 跳转到下一关
+            GameThread.setLevel(currentLevel + 1);
+            thead.reloadGame(); // 重新加载游戏资源
+            startGame(GameThread.getLevel());
+        }
     }
     private void levelDown() {
-        // 跳转到上一关
-        GameThread.setLevel(GameThread.getLevel() - 1);
-        startGame(GameThread.getLevel());
+        int currentLevel = GameThread.getLevel();
+        if (currentLevel > MIN_LEVEL) {
+            // 跳转到上一关
+            GameThread.setLevel(currentLevel - 1);
+            thead.reloadGame(); // 重新加载游戏资源
+            startGame(GameThread.getLevel());
+        }
     }
     private void saveGame() {
         // 实现保存游戏逻辑

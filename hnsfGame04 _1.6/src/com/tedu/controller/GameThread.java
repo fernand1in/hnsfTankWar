@@ -50,11 +50,20 @@ public class GameThread extends Thread {
             }
         }
     }
+    public void reloadGame() {
+        em.getElementsByKey(GameElement.PLAY).clear();
+        em.getElementsByKey(GameElement.ENEMY).clear();
+        em.getElementsByKey(GameElement.MAPS).clear();
+        gameLoad();
+    }
 
     private void gameLoad() {
         GameLoad.loadImg();
-        GameLoad.MapLoad(level); 
+        em.getElementsByKey(GameElement.MAPS).clear();
+        GameLoad.MapLoad(level);
+        em.getElementsByKey(GameElement.PLAY).clear();
         GameLoad.loadPlay();
+        em.getElementsByKey(GameElement.ENEMY).clear();
         GameLoad.loadEnemies();
 
         List<ElementObj> enemys = em.getElementsByKey(GameElement.ENEMY);
