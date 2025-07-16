@@ -80,9 +80,20 @@ public class GameMainJPanel extends JPanel implements Runnable {
 
     public void setGameOver(boolean gameOver) {
         this.gameOver = gameOver;
+        if (!gameOver) { // 当重置失败状态时
+            this.repaint(); // 添加界面刷新
+        }
     }
 
     public void setGameWin(boolean gameWin) {
         this.gameWin = gameWin;
     }
+    public boolean isGameOver() {
+        return gameOver;
+    }
+
+    public boolean isGameWin() {
+        return gameWin;
+    }
+
 }

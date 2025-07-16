@@ -2,7 +2,8 @@ package com.tedu.controller;
 
 import java.util.List;
 import java.util.Map;
-import javax.swing.ImageIcon;
+import javax.swing.*;
+
 import com.tedu.element.ElementObj;
 import com.tedu.element.Enemy;
 import com.tedu.element.Play;
@@ -18,8 +19,6 @@ public class GameThread extends Thread {
     private static boolean GameContinue = false;//是否继续游戏的标志
     private boolean paused = false; // 暂停标志
     private boolean isGameStarted = false; // 游戏启动标志
-    
-    
 
     public GameThread(GameMainJPanel panel) {
         em = ElementManager.getManager();
@@ -161,6 +160,48 @@ public class GameThread extends Thread {
     }
 
     private void gameOver() {
+        if (panel.isGameOver() || panel.isGameWin()) {
+            // 暂停游戏线程
+            setPaused(true);
+
+            String message;
+            if (panel.isGameOver()) {
+                message = "游戏失败！得分：" + em.getScore()+ "\n2秒后重新挑战当前关卡";
+            } else {
+                message = "关卡完成！得分：" + em.getScore();
+                if (level < 10) {
+                    message += "\n2秒后进入下一关";
+                } else {
+                    message += "\n恭喜通关！2秒后退出游戏";
+                }
+            }
+            final String finalMessage = message;
+            // 在事件调度线程中显示对话框
+            SwingUtilities.invokeLater(() -> {
+                JOptionPane.showMessageDialog(panel, finalMessage);
+            });
+
+            try {
+                sleep(2000);
+                if (panel.isGameOver()) {
+                    reloadGame();  // 重新加载当前关卡
+                    panel.setGameOver(false);
+                }
+                else if (panel.isGameWin() && level < 10) {
+                    level++;
+                    reloadGame();  // 重用已有的重置方法
+                    panel.setGameWin(false);
+                } else if (level >= 10) {
+                    System.exit(0);
+                }
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+
+            // 重置游戏状态
+            panel.setGameOver(false);
+            setPaused(false);
+        }
     }
 
     private void checkGameStatus(List<ElementObj> plays, List<ElementObj> enemys) {
@@ -174,6 +215,7 @@ public class GameThread extends Thread {
         if (enemys.isEmpty()) {
             panel.setGameWin(true);
         }
+        gameOver();
     }
     public static void setContinue_status(boolean GameContinue) {
         GameThread.GameContinue = GameContinue;
