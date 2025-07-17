@@ -13,13 +13,13 @@ import java.util.Random;
 import javax.swing.ImageIcon;
 
 public class Enemy extends ElementObj {
-    private int speed = 1;
+    protected int speed = 1;
     private ElementManager em = ElementManager.getManager();
-    private String fx = "up";
-    private int fireInterval = 180; // 每隔180帧发射一次子弹（假设60FPS，即3秒）
-    private int frameCount = 0;     // 游戏帧数计数器
-    private int totalShots = 100;   // 总共发射100次
-    private int shotCount = 0;      // 已经发射的子弹次数
+    protected String fx = "up";
+    protected int fireInterval = 180; // 每隔180帧发射一次子弹（假设60FPS，即3秒）
+    protected int frameCount = 0;     // 游戏帧数计数器
+    protected int totalShots = 100;   // 总共发射100次
+    protected int shotCount = 0;      // 已经发射的子弹次数
 
     @Override
     public void showElement(Graphics g) {

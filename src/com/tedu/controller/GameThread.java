@@ -54,7 +54,12 @@ public class GameThread extends Thread {
         em.getElementsByKey(GameElement.ENEMY).clear();
         em.getElementsByKey(GameElement.MAPS).clear();
         em.getElementsByKey(GameElement.PLAYFILE).clear(); // 清除道具
+        em.getElementsByKey(GameElement.PROP).clear(); // 清除道具
+        em.getElementsByKey(GameElement.BOSS).clear(); // 清除 Boss
+
+        // 重新加载游戏元素
         gameLoad();
+  
     }
 
     private void gameLoad() {
@@ -66,7 +71,8 @@ public class GameThread extends Thread {
         em.getElementsByKey(GameElement.ENEMY).clear();
         GameLoad.loadEnemies();
         GameLoad.loadProp(1); // 加载道具
-
+        GameLoad.loadBoss(level); // 在指定关卡加载Boss
+        
         List<ElementObj> enemys = em.getElementsByKey(GameElement.ENEMY);
         for (ElementObj enemy : enemys) {
             if (enemy instanceof Enemy) {
@@ -93,14 +99,15 @@ public class GameThread extends Thread {
             List<ElementObj> maps = em.getElementsByKey(GameElement.MAPS);
             List<ElementObj> plays = em.getElementsByKey(GameElement.PLAY);
             List<ElementObj> enemyFiles = em.getElementsByKey(GameElement.ENEMYFILE);
-            List<ElementObj> props = em.getElementsByKey(GameElement.PROP); // 获取道具集合
+            List<ElementObj> props = em.getElementsByKey(GameElement.PROP);
+            List<ElementObj> bosses = em.getElementsByKey(GameElement.BOSS);
 
             moveAndUpdate(all, gameTime);
             ElementPK(enemys, files);
             ElementPK(files, maps);
 
             for (ElementObj enemy : enemys) {
-                enemy.model(gameTime); 
+                enemy.model(gameTime);
             }
 
             for (ElementObj enemy : enemys) {
@@ -124,12 +131,25 @@ public class GameThread extends Thread {
             // 玩家与道具的碰撞检测
             for (ElementObj play : plays) {
                 for (ElementObj prop : props) {
-                    if (play.pk(prop)) { // 如果发生碰撞
-                        play.handleCollision(prop); // 处理碰撞逻辑
+                    if (play.pk(prop)) {
+                        play.handleCollision(prop);
                     }
                 }
             }
 
+            // Boss 的逻辑
+            for (ElementObj boss : bosses) {
+                boss.model(gameTime);
+            }
+            
+         // 玩家子弹与 Boss 的碰撞检测
+            for (ElementObj boss : bosses) {
+                for (ElementObj bullet : files) {
+                    if (boss.pk(bullet)) {
+                        boss.handleCollision(bullet);
+                    }
+                }
+            }
             // 检查游戏状态
             checkGameStatus(plays, enemys);
 
@@ -241,4 +261,5 @@ public class GameThread extends Thread {
             notify();
         }
     }
+    
 }

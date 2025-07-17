@@ -15,6 +15,8 @@ import java.util.Set;
 import javax.swing.ImageIcon;
 
 import com.tedu.controller.GameThread;
+import com.tedu.element.Boss;
+import com.tedu.element.BossBullet;
 import com.tedu.element.ElementObj;
 import com.tedu.element.Enemy;
 import com.tedu.element.MapObj;
@@ -30,7 +32,7 @@ public class GameLoad {
     public static void MapLoad(int mapId) {
         ElementManager em = ElementManager.getManager();
         em.getGameElements().get(GameElement.MAPS).clear();
-        String mapName = "com/tedu/text/" + mapId + ".map";
+        String mapName = "com/tedu/text/" + mapId + ".map"; // 动态生成地图文件路径
         System.out.println("地图文件路径: " + mapName);
         ClassLoader classLoader = GameLoad.class.getClassLoader();
         InputStream maps = classLoader.getResourceAsStream(mapName);
@@ -136,7 +138,72 @@ public class GameLoad {
             em.addElement(prop, GameElement.PROP); // 使用PROP作为道具集合的key
         }
     }
+    
+    public static void loadBoss(int level) {
+        if (level == 4 || level == 7 || level == 10) {
+            ElementManager em = ElementManager.getManager();
+            List<ElementObj> maps = em.getElementsByKey(GameElement.MAPS);
+            List<ElementObj> plays = em.getElementsByKey(GameElement.PLAY); // 获取玩家对象列表
 
+            int gameWidth = 900; // 游戏窗口宽度
+            int gameHeight = 600; // 游戏窗口高度
+
+            int bossWidth = 50; // 默认 Boss 宽度
+            int bossHeight = 50; // 默认 Boss 高度
+
+            // 如果玩家对象存在，获取玩家的高度和宽度
+            if (!plays.isEmpty()) {
+                Play player = (Play) plays.get(0);
+                bossWidth = player.getW(); // 设置 Boss 宽度与玩家一致
+                bossHeight = player.getH(); // 设置 Boss 高度与玩家一致
+            }
+
+            int bossCount = 1; // 默认 Boss 数量
+            if (level == 7) {
+                bossCount = 2; // 第七关有2个Boss
+            } else if (level == 10) {
+                bossCount = 3; // 第十关有3个Boss
+            }
+
+            for (int i = 0; i < bossCount; i++) {
+                int x = 0; // 初始化 x
+                int y = 0; // 初始化 y
+
+                boolean validPosition = false;
+                int boundaryMargin = 100; // 边界限制为100
+                while (!validPosition) {
+                    // 随机生成 Boss 的初始位置，确保在边界100个单位以内
+                    x = boundaryMargin + (int) (Math.random() * (gameWidth - bossWidth - boundaryMargin));
+                    y = boundaryMargin + (int) (Math.random() * (gameHeight - bossHeight - boundaryMargin));
+
+                    // 检查是否与地图元素发生碰撞
+                    Rectangle bossRect = new Rectangle(x, y, bossWidth, bossHeight);
+                    boolean collisionDetected = false;
+                    for (ElementObj map : maps) {
+                        if (bossRect.intersects(map.getRectangle())) {
+                            collisionDetected = true;
+                            break;
+                        }
+                    }
+
+                    // 检查是否在边界100个单位以内
+                    if (x < boundaryMargin || x + bossWidth > gameWidth - boundaryMargin ||
+                        y < boundaryMargin || y + bossHeight > gameHeight - boundaryMargin) {
+                        collisionDetected = true;
+                    }
+
+                    // 如果没有碰撞，位置有效
+                    if (!collisionDetected) {
+                        validPosition = true;
+                    }
+                }
+
+                // 创建并添加 Boss
+                ElementObj boss = new Boss().createElement(x + "," + y + ",up");
+                em.addElement(boss, GameElement.BOSS); // 使用BOSS作为Boss集合的key
+            }
+        }
+    }
     public static ElementObj getObj(String str) {
         synchronized (GameLoad.class) { // 使用 synchronized 块保护对 objMap 的访问
             try {
@@ -171,6 +238,8 @@ public class GameLoad {
                 Class<?> forName = Class.forName(classUrl);
                 objMap.put(o.toString(), forName);
             }
+            // 手动添加BossBullet到objMap
+            objMap.put("bossBullet", BossBullet.class);
         } catch (IOException e) {
             e.printStackTrace();
         } catch (ClassNotFoundException e) {

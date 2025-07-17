@@ -111,6 +111,7 @@ public class GameJFrame extends JFrame{
 	public void setThead(Thread thead) {
 		this.thead = (GameThread) thead;
 	}
+	
 	 public void startGame(int level) {
 	        if (jPanel == null) {
 	            createGamePanel();
